@@ -9,6 +9,7 @@ df = df.iloc[:, :2]
 df.columns = ['label', 'text']
 
 df['label'] = df['label'].map({'ham': 0, 'spam': 1})
+df.dropna(inplace=True)
 
 X_train, X_test, y_train, y_test = train_test_split(df['text'], df['label'], test_size=0.2, random_state=42)
 

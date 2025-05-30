@@ -142,3 +142,70 @@ n=2: ████████████████░░ 67.8%
 - Relationship thường là non-linear (không phải cứ thêm từ là tăng tuyến tính)
 - Saturation effect: Sau một threshold, thêm từ không tăng confidence nhiều
 
+## 6. Hướng dẫn chạy Project
+
+### 6.1. Yêu cầu môi trường
+- Python 3.8+
+- pip
+- Node.js và npm (cho extension)
+- Chrome browser (để sử dụng extension)
+
+### 6.2. Clone và cài đặt project
+```bash
+# Clone repository
+git clone https://github.com/F3ust/AI_INTRO_20242.git
+cd AI_INTRO_20242
+```
+
+### 6.3. Cài đặt và chạy backend (Flask API)
+```bash
+cd backend
+
+pip install -r requirements.txt
+
+python app.py
+```
+- API sẽ chạy tại `http://localhost:42069`
+- Console sẽ hiển thị: "Running on http://0.0.0.0:42069"
+
+### 6.4. Build và cài đặt Chrome Extension
+```bash
+cd spam_classifier_extension
+npm install
+npm run build
+
+```
+
+**Cài đặt extension vào Chrome:**
+1. Mở Chrome và vào `chrome://extensions/`
+2. Bật "Developer mode" (Chế độ dành cho nhà phát triển)
+3. Click "Load unpacked" (Tải tiện ích đã giải nén)
+4. Chọn thư mục `spam_classifier_extension/dist/`
+5. Extension "Email Spam Classifier" sẽ xuất hiện trên thanh công cụ
+
+### 6.5. Sử dụng extension
+**Spam Classification:**
+1. Click vào icon extension trên thanh Chrome
+2. Tab "Spam Classification" → Nhập nội dung email
+3. Click "Check" → Xem kết quả (SPAM/HAM + confidence %)
+
+**Word Frequency Analysis:**
+1. Chuyển sang tab "Word Frequency Analysis"
+2. Nhập:
+   - Number of words: 20 (ví dụ)
+   - Word/phrase to analyze: "free" (ví dụ)
+   - Base text: "Hello this is a normal email message" (tùy chọn)
+3. Click "Analyze" → Xem chart hiển thị mối quan hệ n → confidence
+
+
+**Kiểm tra hoạt động:**
+```bash
+# Test API backend
+curl -X POST http://localhost:42069/predict \
+  -H "Content-Type: application/json" \
+  -d '{"text": "FREE money click here NOW!!!"}'
+
+# Kết quả mong đợi:
+# {"confidence": 0.95, "is_spam": true, "label": "spam"}
+```
+

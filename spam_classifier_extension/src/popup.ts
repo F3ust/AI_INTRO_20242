@@ -60,29 +60,29 @@ class PopupManager {
     const checkBtn = document.getElementById('checkBtn') as HTMLButtonElement;
 
     if (!emailContent?.trim()) {
-      this.showError(resultDiv, 'Vui lòng nhập nội dung email');
+      this.showError(resultDiv, 'Please enter email content');
       return;
     }
 
     try {
       checkBtn.disabled = true;
-      checkBtn.textContent = 'Đang phân tích...';
+      checkBtn.textContent = 'Analyzing...';
 
       const result = await ApiService.predictSpam(emailContent);
 
       resultDiv.className = result.is_spam ? 'result spam' : 'result ham';
       resultDiv.innerHTML = `
-        <div>Kết quả: <strong>${result.label.toUpperCase()}</strong></div>
-        <div>Độ tin cậy: <strong>${(result.confidence * 100).toFixed(1)}%</strong></div>
+        <div>Result: <strong>${result.label.toUpperCase()}</strong></div>
+        <div>Confidence: <strong>${(result.confidence * 100).toFixed(1)}%</strong></div>
       `;
       resultDiv.classList.remove('hidden');
 
     } catch (error) {
-      this.showError(resultDiv, 'Lỗi khi phân tích email. Vui lòng thử lại.');
+      this.showError(resultDiv, 'Error analyzing email. Please try again.');
       console.error('Err:', error);
     } finally {
       checkBtn.disabled = false;
-      checkBtn.textContent = 'Kiểm tra';
+      checkBtn.textContent = 'Check';
     }
   }
 
@@ -94,18 +94,18 @@ class PopupManager {
     const chartContainer = document.getElementById('chartContainer') as HTMLDivElement;
 
     if (!wordCount || wordCount <= 0) {
-      this.showAnalysisError('Vui lòng nhập số từ hợp lệ (> 0)');
+      this.showAnalysisError('Please enter valid word count (> 0)');
       return;
     }
 
     if (!targetWord?.trim()) {
-      this.showAnalysisError('Vui lòng nhập từ cần phân tích');
+      this.showAnalysisError('Please enter word to analyze');
       return;
     }
 
     try {
       analyzeBtn.disabled = true;
-      analyzeBtn.textContent = 'Đang phân tích...';
+      analyzeBtn.textContent = 'Analyzing...';
 
       const result = await ApiService.analyzeWordFrequency({
         word_count: wordCount,
@@ -124,11 +124,11 @@ class PopupManager {
       }
 
     } catch (error) {
-      this.showAnalysisError('Lỗi khi phân tích. Vui lòng thử lại.');
+      this.showAnalysisError('Error analyzing. Please try again.');
       console.error('Err:', error);
     } finally {
       analyzeBtn.disabled = false;
-      analyzeBtn.textContent = 'Phân tích';
+      analyzeBtn.textContent = 'Analyze';
     }
   }
 

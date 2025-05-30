@@ -20,7 +20,7 @@ Mô hình sử dụng thuật toán Multinomial Naive Bayes để phân loại e
 
 ```
 git clone https://github.com/F3ust/AI_INTRO_20242.git 
-cd /path/to/project/AI_INTRO_20242/
+cd AI_INTRO_20242/backend
 pip install -r requirements.txt
 ```
 

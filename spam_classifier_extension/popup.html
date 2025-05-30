@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      width: 300px;
+      width: 500px;
       padding: 10px;
     }
     .header {
@@ -15,15 +15,40 @@
       border-bottom: 1px solid #ccc;
       margin-bottom: 15px;
     }
-    textarea {
+    .tabs {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 4px 4px 0 0;
+    }
+    .tab.active {
+      background-color: #4285f4;
+      color: white;
+    }
+    .tab-content {
+      min-height: 300px;
+    }
+    textarea, input {
       width: 100%;
-      height: 100px;
       margin-bottom: 10px;
       resize: none;
       padding: 8px;
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 4px;
+    }
+    textarea {
+      height: 80px;
+    }
+    input[type="number"] {
+      height: 34px;
     }
     button {
       width: 100%;
@@ -33,11 +58,16 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      margin-bottom: 10px;
     }
     button:hover {
       background-color: #357ae8;
     }
-    #result {
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .result {
       margin-top: 15px;
       padding: 10px;
       border-radius: 4px;
@@ -52,8 +82,39 @@
       background-color: #ccffcc;
       color: #388e3c;
     }
+    .error {
+      background-color: #ffcccc;
+      color: #d32f2f;
+    }
     .hidden {
       display: none;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    #chartContainer {
+      margin-top: 20px;
+      height: 300px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px;
+    }
+    #frequencyChart {
+      width: 100%;
+      height: 100%;
+    }
+    .chart-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #666;
+      font-style: italic;
     }
   </style>
 </head>
@@ -61,10 +122,49 @@
   <div class="header">
     <h2>Email Spam Classifier</h2>
   </div>
-  <textarea id="emailContent" placeholder="Enter email content to classify..."></textarea>
-  <button id="checkBtn">Check</button>
-  <div id="result" class="hidden"></div>
 
-  <script src="popup.js"></script>
+  <div class="tabs">
+    <div id="spamTab" class="tab active">Phân loại Spam</div>
+    <div id="analysisTab" class="tab">Phân tích Tần suất</div>
+  </div>
+
+  <!-- Spam Classification Tab -->
+  <div id="spamContent" class="tab-content">
+    <div class="form-group">
+      <label for="emailContent">Nội dung email:</label>
+      <textarea id="emailContent" placeholder="Nhập nội dung email để phân loại..."></textarea>
+    </div>
+    <button id="checkBtn">Kiểm tra</button>
+    <div id="result" class="hidden"></div>
+  </div>
+
+  <!-- Word Frequency Analysis Tab -->
+  <div id="analysisContent" class="tab-content hidden">
+    <div class="form-group">
+      <label for="wordCount">Số từ trong đoạn văn giả định:</label>
+      <input type="number" id="wordCount" min="1" max="100" value="20" placeholder="Ví dụ: 20">
+    </div>
+    
+    <div class="form-group">
+      <label for="targetWord">Từ/cụm từ cần phân tích:</label>
+      <input type="text" id="targetWord" placeholder="Ví dụ: free, money, winner...">
+    </div>
+    
+    <div class="form-group">
+      <label for="baseText">Đoạn văn cơ sở (tùy chọn):</label>
+      <textarea id="baseText" placeholder="Nhập đoạn văn cơ sở hoặc để trống để sử dụng mặc định..."></textarea>
+    </div>
+    
+    <button id="analyzeBtn">Phân tích</button>
+    <div id="analysisError" class="result error hidden"></div>
+    
+    <div id="chartContainer" class="hidden">
+      <div class="chart-placeholder">
+        Đồ thị sẽ hiển thị kết quả phân tích tần suất từ khóa
+      </div>
+    </div>
+  </div>
+
+  <script src="dist/popup.js"></script>
 </body>
 </html> 

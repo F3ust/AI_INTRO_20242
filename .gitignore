@@ -39,3 +39,13 @@ Thumbs.db
 
 # Jupyter Notebook
 .ipynb_checkpoints 
+
+node_modules/
+dist/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+
+

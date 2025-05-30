@@ -67,41 +67,42 @@ def analyze_word_frequency():
     target_word = data['target_word'].lower()
     base_text = data.get('base_text', 'This is a sample email message.')
     
-    # Tạo base text nếu không được cung cấp
+    # Create base text if not provided
     if not base_text.strip():
         base_text = 'This is a sample email message.'
     
-    # Tạo danh sách các từ cơ bản để tạo đoạn văn
+    # Create list of base words to build paragraphs
     base_words = base_text.split()
     
     results = []
     
-    # Tạo các đoạn văn với số lần xuất hiện khác nhau của từ target
-    for n in range(0, min(word_count + 1, 21)):  # Giới hạn tối đa 20 điểm để tránh quá tải
-        # Tạo đoạn văn với độ dài word_count
+    for n in range(0, min(word_count + 1, 50)):
         if n == 0:
-            # Không có target_word
-            current_text = ' '.join(base_words * ((word_count // len(base_words)) + 1))[:word_count*5]
+            multiplier = (word_count // len(base_words)) + 1
+            extended_base = base_words * multiplier
+            current_words = extended_base[:word_count]
         else:
-            # Có n lần target_word
-            remaining_words = word_count - n
-            if remaining_words < 0:
-                remaining_words = 0
+            remaining_words = max(0, word_count - n)
             
-            # Tạo text với target_word xuất hiện n lần
             target_words = [target_word] * n
-            if remaining_words > 0:
-                base_fill = (base_words * ((remaining_words // len(base_words)) + 1))[:remaining_words]
-                all_words = target_words + base_fill
-            else:
-                all_words = target_words
             
-            current_text = ' '.join(all_words)
+            if remaining_words > 0:
+                # Fill remaining space with base words
+                multiplier = (remaining_words // len(base_words)) + 1
+                base_fill = (base_words * multiplier)[:remaining_words]
+                current_words = target_words + base_fill
+            else:
+                current_words = target_words
+        
+        current_text = ' '.join(current_words)
         
         # Predict spam probability
         text_vec = vectorizer.transform([current_text])
         proba = model.predict_proba(text_vec)[0]
-        spam_confidence = float(proba[1]) * 100  # Probability of being spam * 100
+        spam_confidence = float(proba[1]) * 100
+        
+        print(f"n={n}, text_length={len(current_words)}, confidence={spam_confidence:.2f}%")
+        print(f"Text preview: {current_text[:50]}...")
         
         results.append({
             'n': n,

@@ -124,43 +124,43 @@
   </div>
 
   <div class="tabs">
-    <div id="spamTab" class="tab active">Phân loại Spam</div>
-    <div id="analysisTab" class="tab">Phân tích Tần suất</div>
+    <div id="spamTab" class="tab active">Spam Classification</div>
+    <div id="analysisTab" class="tab">Word Frequency Analysis</div>
   </div>
 
   <!-- Spam Classification Tab -->
   <div id="spamContent" class="tab-content">
     <div class="form-group">
-      <label for="emailContent">Nội dung email:</label>
-      <textarea id="emailContent" placeholder="Nhập nội dung email để phân loại..."></textarea>
+      <label for="emailContent">Email content:</label>
+      <textarea id="emailContent" placeholder="Enter email content to classify..."></textarea>
     </div>
-    <button id="checkBtn">Kiểm tra</button>
+    <button id="checkBtn">Check</button>
     <div id="result" class="hidden"></div>
   </div>
 
   <!-- Word Frequency Analysis Tab -->
   <div id="analysisContent" class="tab-content hidden">
     <div class="form-group">
-      <label for="wordCount">Số từ trong đoạn văn giả định:</label>
-      <input type="number" id="wordCount" min="1" max="100" value="20" placeholder="Ví dụ: 20">
+      <label for="wordCount">Number of words in simulated text:</label>
+      <input type="number" id="wordCount" min="1" max="100" value="20" placeholder="e.g. 20">
     </div>
     
     <div class="form-group">
-      <label for="targetWord">Từ/cụm từ cần phân tích:</label>
-      <input type="text" id="targetWord" placeholder="Ví dụ: free, money, winner...">
+      <label for="targetWord">Word/phrase to analyze:</label>
+      <input type="text" id="targetWord" placeholder="e.g. free, money, winner...">
     </div>
     
     <div class="form-group">
-      <label for="baseText">Đoạn văn cơ sở (tùy chọn):</label>
-      <textarea id="baseText" placeholder="Nhập đoạn văn cơ sở hoặc để trống để sử dụng mặc định..."></textarea>
+      <label for="baseText">Base text (optional):</label>
+      <textarea id="baseText" placeholder="Enter base text or leave blank for default..."></textarea>
     </div>
     
-    <button id="analyzeBtn">Phân tích</button>
+    <button id="analyzeBtn">Analyze</button>
     <div id="analysisError" class="result error hidden"></div>
     
     <div id="chartContainer" class="hidden">
       <div class="chart-placeholder">
-        Đồ thị sẽ hiển thị kết quả phân tích tần suất từ khóa
+        Chart will display word frequency analysis results
       </div>
     </div>
   </div>

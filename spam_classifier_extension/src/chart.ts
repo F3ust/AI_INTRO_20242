@@ -9,7 +9,6 @@ export class ChartManager {
       throw new Error(`Chart container not found`);
     }
 
-    // Create text-based chart since Chart.js has CSP issues
     container.innerHTML = this.createTextChart(data);
     container.classList.remove('hidden');
   }
@@ -17,22 +16,25 @@ export class ChartManager {
   private createTextChart(data: WordFrequencyAnalysisResult): string {
     let html = `
       <div style="padding: 10px;">
-        <h4>Kết quả phân tích: "${data.target_word}"</h4>
+        <h4>Analysis Result: "${data.target_word}"</h4>
         <div style="font-family: monospace; font-size: 12px;">
     `;
 
-    // Find max confidence for scaling
     const maxConf = Math.max(...data.results.map(r => r.confidence));
+    const minConf = Math.min(...data.results.map(r => r.confidence));
+    
+    console.log('Chart data:', data.results);
+    console.log('Max confidence:', maxConf, 'Min confidence:', minConf);
     
     data.results.forEach(point => {
-      const barWidth = (point.confidence / maxConf) * 100;
+      const barWidth = maxConf > 0 ? (point.confidence / maxConf) * 100 : 0;
       html += `
         <div style="margin: 5px 0; display: flex; align-items: center;">
           <span style="width: 30px; text-align: right; margin-right: 10px;">n=${point.n}:</span>
           <div style="width: 200px; height: 20px; background: #f0f0f0; margin-right: 10px; position: relative;">
             <div style="width: ${barWidth}%; height: 100%; background: linear-gradient(90deg, #4285f4, #ff6b9d);"></div>
           </div>
-          <span>${point.confidence.toFixed(1)}%</span>
+          <span>${point.confidence.toFixed(2)}%</span>
         </div>
       `;
     });
@@ -40,8 +42,8 @@ export class ChartManager {
     html += `
         </div>
         <div style="margin-top: 15px; font-size: 11px; color: #666;">
-          <strong>Giải thích:</strong> n = số lần từ "${data.target_word}" xuất hiện, 
-          thanh màu = % confidence spam
+          <strong>Explanation:</strong> n = number of times "${data.target_word}" appears, 
+          colored bar = spam confidence %
         </div>
       </div>
     `;
@@ -49,7 +51,4 @@ export class ChartManager {
     return html;
   }
 
-  destroy(): void {
-    // No cleanup needed for text chart
-  }
-} 
+}

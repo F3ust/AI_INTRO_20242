@@ -1,39 +1,144 @@
-# Spam Email Classifier
+# Email Spam Classifier with Word Frequency Analysis
 
+## 1. Giới thiệu Project
 
-## Backend
+### Input/Output
+**Input:**
+- **Spam Classification**: Nội dung email dưới dạng text
+- **Word Frequency Analysis**: 
+  - Số từ trong đoạn văn giả định (1-100)
+  - Từ/cụm từ cần phân tích
+  - Đoạn văn cơ sở (tùy chọn)
 
-- Flask API đơn giản xử lý phân loại email spam/ham
-- Sử dụng mô hình Naive Bayes được huấn luyện từ dữ liệu spam.csv
-- API endpoint: `/predict` (POST) - nhận email và trả về kết quả phân loại
+**Output:**
+- **Spam Classification**: 
+  - Nhãn phân loại (SPAM/HAM)
+  - Độ tin cậy (confidence %)
+- **Word Frequency Analysis**:
+  - Đồ thị mối quan hệ giữa tần suất từ và confidence spam
+  - Dữ liệu chi tiết từng điểm (n lần xuất hiện → % confidence)
 
-## Naive Bayes
+### Cách triển khai
+- **Backend**: Flask API với ML model (Naive Bayes)
+- **Frontend**: Chrome Extension được viết bằng TypeScript
+- **Architecture**: Client-Server model với REST API
+- **Data flow**: Extension → Flask API → ML Model → JSON Response → Extension UI
 
-Mô hình sử dụng thuật toán Multinomial Naive Bayes để phân loại email:
+## 2. Giới thiệu Bài toán
 
-- **Nguyên lý:** Áp dụng định lý Bayes với giả định độc lập giữa các đặc trưng (từ ngữ)
-- **Ưu điểm:** Hiệu quả với dữ liệu văn bản, đơn giản, huấn luyện nhanh
-- **Xử lý dữ liệu:** Chuyển đổi email thành vector đặc trưng sử dụng CountVectorizer
-- **Kết quả:** Trả về nhãn (spam/ham) và độ tin cậy của dự đoán
+### Bài toán chính
+Phân loại email spam/ham tự động sử dụng machine learning để giúp người dùng:
+- Nhận diện email spam nhanh chóng
+- Hiểu được tác động của các từ khóa đối với việc phân loại spam
 
-## Cài đặt
+### Bài toán mở rộng
+Phân tích mối quan hệ giữa tần suất xuất hiện của từ khóa và khả năng email bị coi là spam:
+- **Câu hỏi**: Từ "free" xuất hiện bao nhiêu lần trong email thì khả năng bị coi là spam tăng?
+- **Ứng dụng**: Giúp hiểu behavior của model và tối ưu nội dung email
 
+### Thách thức
+- Xử lý text không chuẩn hóa
+- Cân bằng giữa độ chính xác và tốc độ
+- Visualization kết quả trong môi trường Chrome Extension (CSP limitations)
+
+## 3. Hướng đi/Ý tưởng
+
+### Approach 1: Spam Classification
+- Sử dụng dataset có sẵn (spam.csv) với ~5000 emails đã được label
+- Áp dụng thuật toán Naive Bayes cho text classification
+- Preprocessing: Chuyển đổi text thành feature vectors bằng CountVectorizer
+
+### Approach 2: Word Frequency Impact Analysis
+- **Ý tưởng**: Tạo synthetic text với số lần xuất hiện từ khóa khác nhau
+- **Method**: 
+  1. Tạo đoạn văn base với n từ
+  2. Thay thế k từ bằng target keyword (k = 0, 1, 2, ...)
+  3. Chạy prediction cho từng variation
+  4. Visualize mối quan hệ n → confidence
+
+### Extension Integration
+- **Chrome Extension**: Cung cấp UI/UX thân thiện
+- **Real-time Analysis**: Tích hợp với Gmail để phân tích email trực tiếp
+- **Visualization**: Text-based charts (do CSP restrictions)
+
+## 4. Thuật toán Áp dụng
+
+### Multinomial Naive Bayes
+**Lý do lựa chọn:**
+- Hiệu quả cao với text classification
+- Training nhanh, inference nhanh
+- Xử lý tốt high-dimensional sparse data
+- Robust với noise trong text
+
+**Công thức tính:**
 ```
-git clone https://github.com/F3ust/AI_INTRO_20242.git 
-cd AI_INTRO_20242/backend
-pip install -r requirements.txt
+P(spam|text) = P(text|spam) × P(spam) / P(text)
+
+Với:
+- P(spam|text): Xác suất email là spam given text content
+- P(text|spam): Likelihood của text content given class spam
+- P(spam): Prior probability của class spam
+- P(text): Evidence (normalization factor)
 ```
 
+**Feature Engineering:**
+- **CountVectorizer**: Chuyển text thành bag-of-words vectors
+- **Vocabulary**: Tự động extract từ training data
+- **Normalization**: Lowercase, remove special characters
 
-## Chạy backend
+**Training Process:**
+1. Load spam.csv dataset (ham=0, spam=1)
+2. Split text thành words và tạo vocabulary
+3. Transform text thành count vectors
+4. Fit Naive Bayes model
+5. Save model và vectorizer bằng joblib
 
+## 5. Giải thích Đầu ra
+
+### Spam Classification Output
+```json
+{
+  "is_spam": true,
+  "confidence": 0.856,
+  "label": "spam"
+}
 ```
-python app.py
+- **is_spam**: Boolean decision (True/False)
+- **confidence**: Xác suất của prediction (0.0-1.0)
+- **label**: Human-readable label ("spam"/"ham")
+
+### Word Frequency Analysis Output
+```json
+{
+  "results": [
+    {"n": 0, "confidence": 23.5, "text_preview": "Hello this is normal..."},
+    {"n": 1, "confidence": 45.2, "text_preview": "free Hello this is..."},
+    {"n": 2, "confidence": 67.8, "text_preview": "free free Hello this..."}
+  ],
+  "target_word": "free",
+  "word_count": 20
+}
 ```
-Backend sẽ chạy trên port 42069
 
-## Cài đặt Extension
+**Interpretation:**
+- **n**: Số lần từ khóa xuất hiện trong text
+- **confidence**: % xác suất bị coi là spam
+- **text_preview**: Sample text được tạo ra
+- **Pattern Analysis**: 
+  - n=0 → 23.5%: Text bình thường có confidence thấp
+  - n=1 → 45.2%: Xuất hiện 1 lần "free" tăng confidence
+  - n=2 → 67.8%: Tần suất cao hơn → confidence cao hơn
 
-1. Mở Chrome/Edge, vào trang `chrome://extensions/`
-2. Bật "Developer mode"
-3. Chọn "Load unpacked" và chọn thư mục `spam_classifier_extension`
+### Visual Output
+Text-based chart hiển thị:
+```
+n=0: ████████░░ 23.5%
+n=1: ████████████░░ 45.2%  
+n=2: ████████████████░░ 67.8%
+```
+
+**Insights:**
+- Từ khóa như "free", "money", "winner" thường có impact mạnh
+- Relationship thường là non-linear (không phải cứ thêm từ là tăng tuyến tính)
+- Saturation effect: Sau một threshold, thêm từ không tăng confidence nhiều
+
